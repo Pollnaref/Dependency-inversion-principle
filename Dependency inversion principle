@@ -1,1 +1,48 @@
+#include <iostream>
+#include <vector>
 
+using namespace std;
+
+// Впереднє оголошення класів
+class IButtonListener;
+class Button;
+
+// Абстракція слухача кнопки
+class IButtonListener {
+public:
+    virtual void onButtonPressed(Button* button) = 0;
+};
+
+// Низькорівневий модуль: кнопка
+class Button {
+    vector<IButtonListener*> listeners; // Залежність від абстракції, а не від конкретної реалізації
+
+public:
+    void press() {
+        for (IButtonListener* listener : listeners) {
+            listener->onButtonPressed(this);
+        }
+    }
+
+    void addListener(IButtonListener* listener) {
+        listeners.push_back(listener);
+    }
+};
+
+// Високорівневий модуль: діалог, який реагує на натискання кнопки
+class Dialog : public IButtonListener {
+public:
+    void onButtonPressed(Button* button) override {
+        cout << "Кнопка натиснута у діалозі!" << endl;
+    }
+};
+
+int main() {
+    Dialog dialog;
+    Button button;
+    
+    button.addListener(&dialog);
+    button.press();
+
+    return 0;
+}+
